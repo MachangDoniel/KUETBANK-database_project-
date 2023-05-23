@@ -1,0 +1,1 @@
+-- start D:SQL\KUETBANK(database_project)\pl_sql.sql;
