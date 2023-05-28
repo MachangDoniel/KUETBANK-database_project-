@@ -56,6 +56,7 @@ last_name varchar(20),
 position varchar(20),
 salary number(10,2),
 branch_id number(20),
+primary key(employee_id),
 foreign key(branch_id) references branch
 );
 
