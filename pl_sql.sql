@@ -18,7 +18,7 @@ end;
 
 set serverout on
 declare
-id BRANCH.BRANCH_ID%type:=10010;
+id BRANCH.BRANCH_ID%type:=10020;
 name BRANCH.BRANCH_NAME%type:='ruet1';
 address BRANCH.address%type:='RU road';
 phone BRANCH.phone_no%type:='01987654321';
@@ -150,6 +150,506 @@ end;
 /
 
 --Procedure
+
+--insert customer
+CREATE OR REPLACE PROCEDURE insert_customer(
+  p_customer_id IN customer.customer_id%TYPE,
+  p_first_name IN customer.first_name%TYPE,
+  p_last_name IN customer.last_name%TYPE,
+  p_address IN customer.address%TYPE,
+  p_phone_no IN customer.phone_no%TYPE
+)
+IS
+BEGIN
+  INSERT INTO customer(customer_id, first_name, last_name, address, phone_no)
+  VALUES (p_customer_id, p_first_name, p_last_name, p_address, p_phone_no);
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Customer inserted successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error inserting customer: ' || SQLERRM);
+END;
+/
+
+set serveroutput on
+declare
+BEGIN
+  insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881');
+END;
+/
+
+--modify customer
+CREATE OR REPLACE PROCEDURE modify_customer(
+  p_customer_id IN customer.customer_id%TYPE,
+  p_new_first_name IN customer.first_name%TYPE,
+  p_new_last_name IN customer.last_name%TYPE,
+  p_new_address IN customer.address%TYPE,
+  p_new_phone_no IN customer.phone_no%TYPE
+)
+IS
+BEGIN
+  UPDATE customer
+  SET first_name = p_new_first_name,
+      last_name = p_new_last_name,
+      address = p_new_address,
+      phone_no = p_new_phone_no
+  WHERE customer_id = p_customer_id;
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Customer modified successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error modifying customer: ' || SQLERRM);
+END;
+/
+
+
+set serveroutput on
+declare
+BEGIN
+  --insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881');
+  modify_customer(11, 'Jane', 'Smith', '456 Elm St', '9876543210');
+END;
+/
+
+-- delete customer
+CREATE OR REPLACE PROCEDURE delete_customer(
+  p_customer_id IN customer.customer_id%TYPE
+)
+IS
+BEGIN
+  DELETE FROM customer WHERE customer_id = p_customer_id;
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Customer deleted successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error deleting customer: ' || SQLERRM);
+END;
+/
+
+set serveroutput on
+declare
+BEGIN
+  --insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881');
+  --modify_customer(11, 'Jane', 'Smith', '456 Elm St', '9876543210');
+  delete_customer(11);
+END;
+/
+
+
+--insert account
+CREATE OR REPLACE PROCEDURE insert_account(
+  p_account_no IN account.account_no%TYPE,
+  p_customer_id IN account.customer_id%TYPE,
+  p_account_type IN account.account_type%TYPE,
+  p_balance IN account.balance%TYPE,
+  p_interest_rate IN account.interest_rate%TYPE
+)
+IS
+BEGIN
+  INSERT INTO account(account_no, customer_id, account_type, balance, interest_rate)
+  VALUES (p_account_no, p_customer_id, p_account_type, p_balance, p_interest_rate);
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Account inserted successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error inserting account: ' || SQLERRM);
+END;
+/
+
+
+set serveroutput on
+declare
+BEGIN
+--insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881');
+  insert_account(111, 11, 'Savings', 1000.00, 0.5);
+END;
+/
+
+
+--modify account
+CREATE OR REPLACE PROCEDURE modify_account(
+  p_account_no IN account.account_no%TYPE,
+  p_customer_id IN account.customer_id%TYPE,
+  p_account_type IN account.account_type%TYPE,
+  p_balance IN account.balance%TYPE,
+  p_interest_rate IN account.interest_rate%TYPE
+)
+IS
+BEGIN
+  UPDATE account
+  SET customer_id = p_customer_id,
+      account_type = p_account_type,
+      balance = p_balance,
+      interest_rate = p_interest_rate
+  WHERE account_no = p_account_no;
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Account modified successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error modifying account: ' || SQLERRM);
+END;
+/
+
+
+set serveroutput on
+declare
+BEGIN
+  --insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881');
+  --insert_account(111, 11, 'Savings', 1000.00, 0.5);
+  modify_account(111, 11, 'Checking', 500.00, 0.25);
+END;
+/
+
+
+--delete account
+CREATE OR REPLACE PROCEDURE delete_account(
+  p_account_no IN account.account_no%TYPE
+)
+IS
+BEGIN
+  DELETE FROM account WHERE account_no = p_account_no;
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Account deleted successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error deleting account: ' || SQLERRM);
+END;
+/
+
+
+set serveroutput on
+declare
+BEGIN
+  --insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881');
+  --insert_account(111, 11, 'Savings', 1000.00, 0.5);
+  --modify_account(111, 11, 'Checking', 500.00, 0.25);
+  delete_account(111);
+END;
+/
+
+
+--insert transaction
+CREATE OR REPLACE PROCEDURE insert_transaction(
+  p_transaction_id IN transaction.transaction_id%TYPE,
+  p_transaction_type IN transaction.transaction_type%TYPE,
+  p_amount IN transaction.amount%TYPE,
+  p_from_acc_no IN transaction.from_acc_no%TYPE,
+  p_to_acc_no IN transaction.to_acc_no%TYPE
+)
+IS
+BEGIN
+  INSERT INTO transaction(transaction_id, transaction_type, amount, from_acc_no, to_acc_no)
+  VALUES (p_transaction_id, p_transaction_type, p_amount, p_from_acc_no, p_to_acc_no);
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Transaction inserted successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error inserting transaction: ' || SQLERRM);
+END;
+/
+
+
+set serveroutput on
+declare
+BEGIN
+  --insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881');
+  --insert_account(111, 11, 'Savings', 1000.00, 0.5);
+  --modify_account(111, 11, 'Checking', 500.00, 0.25);
+  --delete_account(111);
+  --insert_account(111, 11, 'Savings', 1000.00, 0.5);
+  --modify_account(111, 11, 'Checking', 500.00, 0.25);
+  --delete_account(111);
+  insert_transaction(1011, 'Transfer', 500.00, 111, 101);
+END;
+/
+
+
+--modify transaction
+CREATE OR REPLACE PROCEDURE modify_transaction(
+  p_transaction_id IN transaction.transaction_id%TYPE,
+  p_transaction_type IN transaction.transaction_type%TYPE,
+  p_amount IN transaction.amount%TYPE,
+  p_from_acc_no IN transaction.from_acc_no%TYPE,
+  p_to_acc_no IN transaction.to_acc_no%TYPE
+)
+IS
+BEGIN
+  UPDATE transaction
+  SET transaction_type = p_transaction_type,
+      amount = p_amount,
+      from_acc_no = p_from_acc_no,
+      to_acc_no = p_to_acc_no
+  WHERE transaction_id = p_transaction_id;
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Transaction modified successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error modifying transaction: ' || SQLERRM);
+END;
+/
+
+
+set serveroutput on
+declare
+BEGIN
+  --insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881');
+  --insert_account(111, 11, 'Savings', 1000.00, 0.5);
+  --modify_account(111, 11, 'Checking', 500.00, 0.25);
+  --delete_account(111);
+  --insert_account(111, 11, 'Savings', 1000.00, 0.5);
+  --modify_account(111, 11, 'Checking', 500.00, 0.25);
+  --delete_account(111);
+  --insert_transaction(1011, 'Transfer', 500.00, 111, 101);
+    modify_transaction(1011, 'Deposit', 1000.00, 111, 101);
+END;
+/
+
+
+--delete transaction
+CREATE OR REPLACE PROCEDURE delete_transaction(
+  p_transaction_id IN transaction.transaction_id%TYPE
+)
+IS
+BEGIN
+  DELETE FROM transaction WHERE transaction_id = p_transaction_id;
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Transaction deleted successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error deleting transaction: ' || SQLERRM);
+END;
+/
+
+
+set serveroutput on
+declare
+BEGIN
+  --insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881');
+  --insert_account(111, 11, 'Savings', 1000.00, 0.5);
+  --modify_account(111, 11, 'Checking', 500.00, 0.25);
+  --delete_account(111);
+  --insert_account(111, 11, 'Savings', 1000.00, 0.5);
+  --modify_account(111, 11, 'Checking', 500.00, 0.25);
+  --delete_account(111);
+  --insert_transaction(1011, 'Transfer', 500.00, 111, 101);
+    --modify_transaction(1011, 'Deposit', 1000.00, 111, 101);
+    delete_transaction(10001);
+END;
+/
+
+
+--insert branch
+CREATE OR REPLACE PROCEDURE insert_branch(
+  p_branch_id IN branch.branch_id%TYPE,
+  p_branch_name IN branch.branch_name%TYPE,
+  p_address IN branch.address%TYPE,
+  p_phone_no IN branch.phone_no%TYPE
+)
+IS
+BEGIN
+  INSERT INTO branch(branch_id, branch_name, address, phone_no)
+  VALUES (p_branch_id, p_branch_name, p_address, p_phone_no);
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Branch inserted successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error inserting branch: ' || SQLERRM);
+END;
+/
+
+
+set serveroutput on
+declare
+BEGIN
+  insert_branch(10011, 'Main Branch', '123 Main St', '01234567890');
+END;
+/
+
+
+--modify branch
+CREATE OR REPLACE PROCEDURE modify_branch(
+  p_branch_id IN branch.branch_id%TYPE,
+  p_branch_name IN branch.branch_name%TYPE,
+  p_address IN branch.address%TYPE,
+  p_phone_no IN branch.phone_no%TYPE
+)
+IS
+BEGIN
+  UPDATE branch
+  SET branch_name = p_branch_name,
+      address = p_address,
+      phone_no = p_phone_no
+  WHERE branch_id = p_branch_id;
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Branch modified successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error modifying branch: ' || SQLERRM);
+END;
+/
+
+
+set serveroutput on
+declare
+BEGIN
+  --insert_branch(10011, 'Main Branch', '123 Main St', '01234567890');
+    modify_branch(10011, 'Updated Branch', '456 Elm St', '09876543210');
+END;
+/
+
+
+--delete branch
+CREATE OR REPLACE PROCEDURE delete_branch(
+  p_branch_id IN branch.branch_id%TYPE
+)
+IS
+BEGIN
+  DELETE FROM branch WHERE branch_id = p_branch_id;
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Branch deleted successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error deleting branch: ' || SQLERRM);
+END;
+/
+
+
+set serveroutput on
+declare
+BEGIN
+  --insert_branch(10011, 'Main Branch', '123 Main St', '01234567890');
+  --modify_branch(10011, 'Updated Branch', '456 Elm St', '09876543210');
+    delete_branch(10011);
+END;
+/
+
+
+--insert employee
+CREATE OR REPLACE PROCEDURE insert_employee(
+  p_employee_id IN employee.employee_id%TYPE,
+  p_first_name IN employee.first_name%TYPE,
+  p_last_name IN employee.last_name%TYPE,
+  p_position IN employee.position%TYPE,
+  p_salary IN employee.salary%TYPE,
+  p_branch_id IN employee.branch_id%TYPE
+)
+IS
+BEGIN
+  INSERT INTO employee(employee_id, first_name, last_name, position, salary, branch_id)
+  VALUES (p_employee_id, p_first_name, p_last_name, p_position, p_salary, p_branch_id);
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Employee inserted successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error inserting employee: ' || SQLERRM);
+END;
+/
+
+
+set serveroutput on
+declare
+BEGIN
+  --insert_branch(10011, 'Main Branch', '123 Main St', '01234567890');
+  --modify_branch(10011, 'Updated Branch', '456 Elm St', '09876543210');
+    --delete_branch(10011);
+    insert_employee(21, 'John', 'Doe', 'Manager', 5000.00, 10011);
+END;
+/
+
+
+--modify employee
+CREATE OR REPLACE PROCEDURE modify_employee(
+  p_employee_id IN employee.employee_id%TYPE,
+  p_first_name IN employee.first_name%TYPE,
+  p_last_name IN employee.last_name%TYPE,
+  p_position IN employee.position%TYPE,
+  p_salary IN employee.salary%TYPE,
+  p_branch_id IN employee.branch_id%TYPE
+)
+IS
+BEGIN
+  UPDATE employee
+  SET first_name = p_first_name,
+      last_name = p_last_name,
+      position = p_position,
+      salary = p_salary,
+      branch_id = p_branch_id
+  WHERE employee_id = p_employee_id;
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Employee modified successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error modifying employee: ' || SQLERRM);
+END;
+/
+
+
+set serveroutput on
+declare
+BEGIN
+  --insert_branch(10011, 'Main Branch', '123 Main St', '01234567890');
+  --modify_branch(10011, 'Updated Branch', '456 Elm St', '09876543210');
+    --delete_branch(10011);
+    --insert_employee(21, 'John', 'Doe', 'Manager', 5000.00, 10011);
+    modify_employee(21, 'Jane', 'Smith', 'Supervisor', 4500.00, 10011);
+END;
+/
+
+
+--delete employee
+CREATE OR REPLACE PROCEDURE delete_employee(
+  p_employee_id IN employee.employee_id%TYPE
+)
+IS
+BEGIN
+  DELETE FROM employee WHERE employee_id = p_employee_id;
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Employee deleted successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Error deleting employee: ' || SQLERRM);
+END;
+/
+
+
+set serveroutput on
+declare
+BEGIN
+  --insert_branch(10011, 'Main Branch', '123 Main St', '01234567890');
+  --modify_branch(10011, 'Updated Branch', '456 Elm St', '09876543210');
+    --delete_branch(10011);
+    --insert_employee(21, 'John', 'Doe', 'Manager', 5000.00, 10011);
+    --modify_employee(21, 'Jane', 'Smith', 'Supervisor', 4500.00, 10011);
+    delete_employee(21);
+END;
+/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 --find_account
 CREATE OR REPLACE PROCEDURE find_account(
