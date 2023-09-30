@@ -15,13 +15,32 @@ drop table branch;
 
 --table creation
 
+create table branch(
+branch_id number(20),
+branch_name varchar(20),
+address varchar(20),
+phone_no varchar(11),
+primary key(branch_id)
+);
+create table employee(
+employee_id number(20),
+first_name varchar(20),
+last_name varchar(20),
+position varchar(20),
+salary number(10,2),
+branch_id number(20),
+primary key(employee_id),
+foreign key(branch_id) references branch
+);
 create table customer(
 customer_id number(20),
 first_name varchar(20),
 last_name varchar(20),
 address varchar(20),
 phone_no varchar(11),
-primary key(customer_id)
+branch_id number(20),
+primary key(customer_id),
+foreign key(branch_id) references branch
 );
 create table account(
 account_no number(20),
@@ -41,23 +60,6 @@ to_acc_no number(20),
 primary key(transaction_id),
 foreign key(from_acc_no) references account(account_no),
 foreign key(to_acc_no) references account(account_no)
-);
-create table branch(
-branch_id number(20),
-branch_name varchar(20),
-address varchar(20),
-phone_no varchar(11),
-primary key(branch_id)
-);
-create table employee(
-employee_id number(20),
-first_name varchar(20),
-last_name varchar(20),
-position varchar(20),
-salary number(10,2),
-branch_id number(20),
-primary key(employee_id),
-foreign key(branch_id) references branch
 );
 
 --describe table

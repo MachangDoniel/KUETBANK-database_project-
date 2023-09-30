@@ -33,7 +33,7 @@ set serveroutput on
 declare
 customer_row customer%rowtype;
 begin
-select customer_id,FIRST_NAME,ADDRESS,PHONE_NO into customer_row.customer_id,customer_row.FIRST_NAME,customer_row.ADDRESS,customer_row.PHONE_NO from customer where customer_id=4;
+select customer_id,FIRST_NAME,ADDRESS,PHONE_NO,branch_id into customer_row.customer_id,customer_row.FIRST_NAME,customer_row.ADDRESS,customer_row.PHONE_NO,customer_row.BRANCH_ID from customer where customer_id=4;
 dbms_output.put_line('ID: ' || customer_row.customer_id || ' Name: ' || customer_row.FIRST_NAME || ' Address: ' || customer_row.ADDRESS || ' Phone: ' || customer_row.PHONE_NO);
 end;
 /
@@ -108,46 +108,6 @@ begin
 end;
 /
 
---IF /ELSEIF /ELSE
-
-set serveroutput on
-declare
-counter number:=1;
-name customer.first_name%type;
-address CUSTOMER.ADDRESS%type;
-type namearray is varray(5) of customer.first_name%type;
-a_name namearray:=namearray();
-begin
-    counter:=1;
-    for x in 2..5
-    loop
-    select first_name into name from customer where customer_id=x; 
-    a_name.extend();
-    a_name(counter):=name;
-    counter:=counter+1;
-    end loop;
-    counter:=1;
-    while counter<=a_name.count
-    loop
-    select address into address from customer where first_name=(a_name(counter));
-    if address='Khagrachari'
-        then
-            dbms_output.put_line(a_name(counter) || ' is from Khagrachari ');
-    elsif address='Rangamati'
-        then
-            dbms_output.put_line(a_name(counter) || ' is from Rangamati ');
-    elsif address='Bandarban'
-        then
-            dbms_output.put_line(a_name(counter) || ' is from Bandarban ');
-    else
-            dbms_output.put_line(a_name(counter) || ' is not from Hill Tracts ');
-
-    end if;
-    counter:=counter+1;
-    
-    end loop;
-end;
-/
 
 --Procedure
 
@@ -157,12 +117,13 @@ CREATE OR REPLACE PROCEDURE insert_customer(
   p_first_name IN customer.first_name%TYPE,
   p_last_name IN customer.last_name%TYPE,
   p_address IN customer.address%TYPE,
-  p_phone_no IN customer.phone_no%TYPE
+  p_phone_no IN customer.phone_no%TYPE,
+  p_branch_id IN customer.branch_id%TYPE
 )
 IS
 BEGIN
-  INSERT INTO customer(customer_id, first_name, last_name, address, phone_no)
-  VALUES (p_customer_id, p_first_name, p_last_name, p_address, p_phone_no);
+  INSERT INTO customer(customer_id, first_name, last_name, address, phone_no, branch_id)
+  VALUES (p_customer_id, p_first_name, p_last_name, p_address, p_phone_no, p_branch_id);
   COMMIT;
   DBMS_OUTPUT.PUT_LINE('Customer inserted successfully.');
 EXCEPTION
@@ -174,7 +135,7 @@ END;
 set serveroutput on
 declare
 BEGIN
-  insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881');
+  insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881',10010);
 END;
 /
 
@@ -184,7 +145,8 @@ CREATE OR REPLACE PROCEDURE modify_customer(
   p_new_first_name IN customer.first_name%TYPE,
   p_new_last_name IN customer.last_name%TYPE,
   p_new_address IN customer.address%TYPE,
-  p_new_phone_no IN customer.phone_no%TYPE
+  p_new_phone_no IN customer.phone_no%TYPE,
+  p_new_branch_id IN customer.branch_id%TYPE
 )
 IS
 BEGIN
@@ -192,7 +154,8 @@ BEGIN
   SET first_name = p_new_first_name,
       last_name = p_new_last_name,
       address = p_new_address,
-      phone_no = p_new_phone_no
+      phone_no = p_new_phone_no,
+      branch_id = p_new_branch_id
   WHERE customer_id = p_customer_id;
   COMMIT;
   DBMS_OUTPUT.PUT_LINE('Customer modified successfully.');
@@ -206,8 +169,8 @@ END;
 set serveroutput on
 declare
 BEGIN
-  --insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881');
-  modify_customer(11, 'Jane', 'Smith', '456 Elm St', '9876543210');
+  --insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881',10010);
+  modify_customer(11, 'Jane', 'Smith', '456 Elm St', '9876543210',10010);
 END;
 /
 
@@ -229,8 +192,8 @@ END;
 set serveroutput on
 declare
 BEGIN
-  --insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881');
-  --modify_customer(11, 'Jane', 'Smith', '456 Elm St', '9876543210');
+  --insert_customer(11, 'John', 'Doe', '123 Main St', '01234567881',10010);
+  --modify_customer(11, 'Jane', 'Smith', '456 Elm St', '9876543210',10010);
   delete_customer(11);
 END;
 /
@@ -520,6 +483,7 @@ BEGIN
   --insert_branch(10011, 'Main Branch', '123 Main St', '01234567890');
   --modify_branch(10011, 'Updated Branch', '456 Elm St', '09876543210');
     delete_branch(10011);
+    delete_branch(10020);
 END;
 /
 
@@ -764,14 +728,14 @@ END;
 
 set serveroutput on
 declare
-emp_id EMPLOYEE.EMPLOYEE_ID%type:=10;
+emp_id EMPLOYEE.EMPLOYEE_ID%type:=11;
 emp_first_name EMPLOYEE.FIRST_NAME%type;
 emp_last_name EMPLOYEE.LAST_NAME%type;
 emp_position EMPLOYEE.POSITION%type;
 emp_salary EMPLOYEE.SALARY%type;
 emp_branch_id EMPLOYEE.BRANCH_ID%type;
 begin
-    emp_id:=10;
+    emp_id:=11;
     find_employee(emp_id,emp_first_name,emp_last_name,emp_position,emp_salary,emp_branch_id);
 end;
 /
